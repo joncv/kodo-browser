@@ -76,7 +76,7 @@ angular.module('web')
                     doneCallback();
                   }
                 })
-            } else {
+            } else if (!item.StorageClass || item.StorageClass.toLowerCase() !== 'glacier') {
               eachCallback(item);
             }
           });
