@@ -330,6 +330,7 @@ module.exports = {
   filesize: "ファイルサイズ",
   "codepreview.notsupport": "このファイルは直接開くことはできません。ローカルにダウンロードしてから開いてください。",
   "download.file": "ダウンロードファイル",
+  "archived.notsupport": "アーカイブファイルのプレビューはサポートされていません",
 
   lastModifyTime: "最終更新日",
   "to.load.more": "もっと読み込む...",

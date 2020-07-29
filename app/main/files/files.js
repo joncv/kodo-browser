@@ -1364,6 +1364,8 @@ angular.module("web").controller("filesCtrl", [
                 });
 
                 gotoAddress($scope.currentBucketName, row.path);
+              } else if (row.StorageClass && row.StorageClass.toLowerCase() === 'glacier') {
+                Dialog.alert(T('cannot.preview'), '归档存储文件不支持预览', null, 1);
               } else {
                 showPreview(row);
               }

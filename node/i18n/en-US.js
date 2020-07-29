@@ -331,6 +331,7 @@ module.exports = {
   filesize: "File size",
   "codepreview.notsupport": "This file can not be opening directly, please download to the local and then open.",
   "download.file": "Download File",
+  "archived.notsupport": "Not support to preview archived file",
 
   lastModifyTime: "Last Modified",
   "to.load.more": "Load more...",
