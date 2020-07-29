@@ -108,9 +108,13 @@ angular.module("web").controller("filesCtrl", [
       // object ops
       showAddFolder: showAddFolder,
       showRename: showRename,
+      isRenameButtonDisabled: isRenameButtonDisabled,
       showMove: showMove,
+      isCopyButtonDisabled: isCopyButtonDisabled,
+      isMoveButtonDisabled: isMoveButtonDisabled,
       showDeleteFiles: showDeleteFiles,
       showDeleteFilesSelected: showDeleteFilesSelected,
+      isDeleteButtonDisabled: isDeleteButtonDisabled,
 
       // upload && download
       handlers: {
@@ -119,7 +123,9 @@ angular.module("web").controller("filesCtrl", [
       },
       handlerDrop: handlerDrop,
       showUploadDialog: showUploadDialog,
+      isUploadDialogButtonDisabled: isUploadDialogButtonDisabled,
       showDownloadDialog: showDownloadDialog,
+      isDownloadDialogButtonDisabled: isDownloadDialogButtonDisabled,
       showDownload: showDownload,
 
       // utils
@@ -129,6 +135,7 @@ angular.module("web").controller("filesCtrl", [
       gotoExternalPath: gotoExternalPath,
       showDownloadLink: showDownloadLink,
       showDownloadLinkOfFilesSelected: showDownloadLinkOfFilesSelected,
+      isDownloadLinkOfFilesButtonDisabled: isDownloadLinkOfFilesButtonDisabled,
       showPreview: showPreview,
       showACL: showACL,
 
@@ -769,6 +776,10 @@ angular.module("web").controller("filesCtrl", [
       }).result.then(angular.noop, angular.noop);
     }
 
+    function isRenameButtonDisabled() {
+      return $scope.sel.has.length !== 1 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.rename;
+    }
+
     function showPaste() {
       var keyword = $scope.keepMoveOptions.isCopy ? T("copy") : T("move");
 
@@ -863,6 +874,14 @@ angular.module("web").controller("filesCtrl", [
       };
     }
 
+    function isCopyButtonDisabled() {
+      return $scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.copy;
+    }
+
+    function isMoveButtonDisabled() {
+      return $scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.move;
+    }
+
     function showDownloadLink(item) {
       $modal.open({
         templateUrl: "main/files/modals/show-download-link-modal.html",
@@ -880,6 +899,13 @@ angular.module("web").controller("filesCtrl", [
 
     function showDownloadLinkOfFilesSelected() {
       showDownloadLinks($scope.sel.has);
+    }
+
+    function isDownloadLinkOfFilesButtonDisabled() {
+      if ($scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.read) {
+        return true;
+      }
+      return isAllArchivedFilesSelected();
     }
 
     function showDownloadLinks(items) {
@@ -974,6 +1000,10 @@ angular.module("web").controller("filesCtrl", [
 
     function showDeleteFilesSelected() {
       showDeleteFiles($scope.sel.has);
+    }
+
+    function isDeleteButtonDisabled() {
+      return $scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.remove;
     }
 
     function showDeleteFiles(items) {
@@ -1093,6 +1123,10 @@ angular.module("web").controller("filesCtrl", [
       });
     }
 
+    function isUploadDialogButtonDisabled() {
+      return !$scope.currentBucketPerm || !$scope.currentBucketPerm.write;
+    }
+
     function showDownloadDialog() {
       if (downloadDialog) return;
 
@@ -1112,6 +1146,13 @@ angular.module("web").controller("filesCtrl", [
       });
     }
 
+    function isDownloadDialogButtonDisabled() {
+      if ($scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.write) {
+        return true;
+      }
+      return isAllArchivedFilesSelected();
+    }
+
     function tryDownloadFiles(to) {
       to = to.replace(/(\/*$)/g, "");
 
@@ -1127,6 +1168,10 @@ angular.module("web").controller("filesCtrl", [
        * @param toLocalPath {string}
        */
       $scope.handlers.downloadFilesHandler(selectedFiles, to);
+    }
+
+    function isAllArchivedFilesSelected() {
+      return $scope.sel.has.every((ele) => { return ele.StorageClass && ele.StorageClass.toLowerCase() === 'glacier'; });
     }
 
     /**
@@ -1358,10 +1403,12 @@ angular.module("web").controller("filesCtrl", [
             }
 
             var acts = ['<div class="btn-group btn-group-xs">'];
-            if ($scope.currentBucketPerm.read) {
-              acts.push(`<button type="button" class="btn download"><span class="fa fa-download"></span></button>`);
-              if (!row.isFolder) {
-                acts.push(`<button type="button" class="btn download-link"><span class="fa fa-link"></span></button>`);
+            if (!row.storageClass || row.storageClass.toLowerCase() !== 'glacier') {
+              if ($scope.currentBucketPerm.read) {
+                acts.push(`<button type="button" class="btn download"><span class="fa fa-download"></span></button>`);
+                if (!row.isFolder) {
+                  acts.push(`<button type="button" class="btn download-link"><span class="fa fa-link"></span></button>`);
+                }
               }
             }
             if ($scope.currentBucketPerm.remove) {

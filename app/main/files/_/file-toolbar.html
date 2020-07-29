@@ -16,36 +16,36 @@
 
     <div class="btn-group" role="group" ng-if="!copy.pwd">
 
-      <button type="button" class="btn btn-default btn-sm" ng-click="showUploadDialog()" ng-disabled="!currentBucketPerm || !currentBucketPerm.write">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showUploadDialog()" ng-disabled="isUploadDialogButtonDisabled()">
         <i class="glyphicon glyphicon-cloud-upload text-info"></i>
         {{'upload'|translate}}
       </button>
-      <button type="button" class="btn btn-default btn-sm" ng-click="showDownloadDialog()" ng-disabled="sel.has.length==0 || !currentBucketPerm || !currentBucketPerm.read">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showDownloadDialog()" ng-disabled="isDownloadDialogButtonDisabled()">
         <i class="glyphicon glyphicon-cloud-download text-primary"></i>
         {{'download'|translate}}
       </button>
 
-      <button type="button" class="btn btn-default btn-sm" ng-click="showMove(sel.has, true)" ng-disabled="sel.has.length==0 || !currentBucketPerm || !currentBucketPerm.copy">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showMove(sel.has, true)" ng-disabled="isCopyButtonDisabled()">
         <i class="fa fa-clone text-primary"></i>
         {{'copy'|translate}}
       </button>
 
-      <button type="button" class="btn btn-default btn-sm" ng-click="showMove(sel.has)" ng-disabled="sel.has.length==0 || !currentBucketPerm || !currentBucketPerm.move">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showMove(sel.has)" ng-disabled="isMoveButtonDisabled()">
         <i class="fa fa-clone text-primary"></i>
         {{'move'|translate}}
       </button>
 
-      <button type="button" class="btn btn-default btn-sm" ng-click="showRename(sel.has[0])" ng-disabled="sel.has.length!=1 || !currentBucketPerm || !currentBucketPerm.rename">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showRename(sel.has[0])" ng-disabled="isRenameButtonDisabled()">
         <i class="fa fa-clone text-primary"></i>
         {{'rename'|translate}}
       </button>
 
-      <button type="button" class="btn btn-default btn-sm" ng-click="showDeleteFilesSelected()" ng-disabled="sel.has.length==0 || !currentBucketPerm || !currentBucketPerm.remove">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showDeleteFilesSelected()" ng-disabled="isDeleteButtonDisabled()">
         <i class="fa fa-clone text-primary"></i>
         {{'delete'|translate}}
       </button>
 
-      <button type="button" class="btn btn-default btn-sm" ng-click="showDownloadLinkOfFilesSelected()" ng-disabled="sel.has.length==0 || !currentBucketPerm || !currentBucketPerm.read">
+      <button type="button" class="btn btn-default btn-sm" ng-click="showDownloadLinkOfFilesSelected()" ng-disabled="isDownloadLinkOfFilesButtonDisabled()">
         <i class="fa fa-link text-primary"></i>
         {{'exportDownloadLinks'|translate}}
       </button>
