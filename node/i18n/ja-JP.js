@@ -259,6 +259,7 @@ module.exports = {
   "move.error1": "一部のファイルは移動できません",
   "copy.success": "正常にコピーされました",
   "move.success": "正常に移動いた",
+  "copy.move.archived.error1": "アーカイブされたファイルはコピーまたは移動できません",
 
   stop: "停止",
 

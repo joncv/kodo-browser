@@ -260,6 +260,7 @@ module.exports = {
   "move.error1": "部分目录或文件无法移动",
   "copy.success": "复制成功",
   "move.success": "移动成功",
+  "copy.move.archived.error1": "归档文件无法被复制或移动",
 
   stop: "停止",
 

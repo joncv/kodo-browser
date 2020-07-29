@@ -777,7 +777,10 @@ angular.module("web").controller("filesCtrl", [
     }
 
     function isRenameButtonDisabled() {
-      return $scope.sel.has.length !== 1 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.rename;
+      if ($scope.sel.has.length !== 1 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.rename) {
+        return true;
+      }
+      return isAllArchivedFilesSelected();
     }
 
     function showPaste() {
@@ -875,11 +878,17 @@ angular.module("web").controller("filesCtrl", [
     }
 
     function isCopyButtonDisabled() {
-      return $scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.copy;
+      if ($scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.copy) {
+        return true;
+      }
+      return isAllArchivedFilesSelected();
     }
 
     function isMoveButtonDisabled() {
-      return $scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.move;
+      if ($scope.sel.has.length === 0 || !$scope.currentBucketPerm || !$scope.currentBucketPerm.move) {
+        return true;
+      }
+      return isAllArchivedFilesSelected();
     }
 
     function showDownloadLink(item) {

@@ -1,11 +1,10 @@
 angular.module('web')
-  .controller('moveModalCtrl', ['$scope', '$uibModalInstance', '$timeout', 'items', 'isCopy', 'renamePath', 'fromInfo', 'moveTo', 'callback', 's3Client', 'Toast', 'AuthInfo', 'safeApply', 'AuditLog',
-    function ($scope, $modalInstance, $timeout, items, isCopy, renamePath, fromInfo, moveTo, callback, s3Client, Toast, AuthInfo, safeApply, AuditLog) {
-      const path = require("path");
-      const filter = require("array-filter");
-      const map = require("array-map");
-
-      var authInfo = AuthInfo.get();
+  .controller('moveModalCtrl', ['$scope', '$uibModalInstance', '$timeout', '$translate', 'items', 'isCopy', 'renamePath', 'fromInfo', 'moveTo', 'callback', 's3Client', 'Toast', 'safeApply', 'AuditLog',
+    function ($scope, $modalInstance, $timeout, $translate, items, isCopy, renamePath, fromInfo, moveTo, callback, s3Client, Toast, safeApply, AuditLog) {
+      const path = require("path"),
+            filter = require("array-filter"),
+            map = require("array-map"),
+            T = $translate.instant;
 
       angular.extend($scope, {
         renamePath: renamePath,
@@ -18,16 +17,6 @@ angular.module('web')
         start: start,
         stop: stop,
 
-        // reg: {
-        //   folderName: /^[^\/]+$/
-        // },
-        // s3FileConfig: {
-        //   id: authInfo.id,
-        //   secret: authInfo.secret,
-        //   region: currentInfo.region,
-        //   bucket: currentInfo.bucket,
-        //   key: currentInfo.key
-        // },
         moveTo: {
           region: moveTo.region,
           bucket: moveTo.bucket,
@@ -53,13 +42,14 @@ angular.module('web')
         $scope.isStop = false;
         $scope.step = 2;
 
-        var target = angular.copy($scope.moveTo);
-        var items = filter(angular.copy($scope.items), (item) => {
+        const target = angular.copy($scope.moveTo);
+        let archivedFiles = [];
+        let items = filter(angular.copy($scope.items), (item) => {
           if (fromInfo.bucket !== target.bucket) {
             return true;
           }
-          var entries = filter([target.key, item.name], (name) => { return name });
-          var path = map(entries, (name) => { return name.replace(/^\/*([^/].+[^/])\/*$/, '$1'); }).join('/');
+          let entries = filter([target.key, item.name], (name) => { return name });
+          let path = map(entries, (name) => { return name.replace(/^\/*([^/].+[^/])\/*$/, '$1'); }).join('/');
           if (item.isFolder) {
             return item.path !== path + '/';
           }
@@ -75,8 +65,16 @@ angular.module('web')
         }
 
         angular.forEach(items, (n) => {
-          //n.region = currentInfo.region;
           n.bucket = fromInfo.bucket;
+        });
+
+        items = items.filter((n) => {
+          if (n.StorageClass && n.StorageClass.toLowerCase() === 'glacier') {
+            archivedFiles = archivedFiles.concat([n]);
+            return false;
+          } else {
+            return true;
+          }
         });
 
         AuditLog.log('moveOrCopyFilesStart', {
@@ -92,12 +90,25 @@ angular.module('web')
         });
 
         //复制 or 移动
+        let archivedFilesAdded = false;
         s3Client.copyFiles(fromInfo.region, items, target, (prog) => {
           //进度
+          if (!archivedFilesAdded) {
+            if (prog.total !== undefined) {
+              prog.total += archivedFiles.length;
+            }
+            if (prog.errorCount !== undefined) {
+              prog.errorCount += archivedFiles.length;
+            }
+            archivedFilesAdded = true;
+          }
           $scope.progress = angular.copy(prog);
           safeApply($scope);
         }, !isCopy, renamePath).then((terr) => {
           //结果
+          terr = archivedFiles.map((file) => {
+            return { error: new Error(T('copy.move.archived.error1')), item: file };
+          }).concat(terr);
           $scope.step = 3;
           $scope.terr = terr;
           AuditLog.log('moveOrCopyFilesDone');

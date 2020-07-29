@@ -260,6 +260,7 @@ module.exports = {
   "move.error1": "Some files can not be moved",
   "copy.success": "Copied successfully",
   "move.success": "Moved successfully",
+  "copy.move.archived.error1": "Archived files are not be able to copy or move",
 
   stop: "Stop",
 
