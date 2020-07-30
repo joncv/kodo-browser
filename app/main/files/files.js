@@ -90,6 +90,7 @@ angular.module("web").controller("filesCtrl", [
       },
       selectFile: selectFile,
       toLoadMore: toLoadMore,
+      doubleClickFile: doubleClickFile,
 
       stepByStepLoadingFiles: stepByStepLoadingFiles,
 
@@ -136,8 +137,6 @@ angular.module("web").controller("filesCtrl", [
       showDownloadLink: showDownloadLink,
       showDownloadLinkOfFilesSelected: showDownloadLinkOfFilesSelected,
       isDownloadLinkOfFilesButtonDisabled: isDownloadLinkOfFilesButtonDisabled,
-      showPreview: showPreview,
-      showACL: showACL,
 
       showPaste: showPaste,
       cancelPaste: cancelPaste,
@@ -661,10 +660,10 @@ angular.module("web").controller("filesCtrl", [
     }
 
     function showPreview(item, type) {
-      var fileType = fileSvs.getFileType(item);
+      let fileType = fileSvs.getFileType(item);
       fileType.type = type || fileType.type;
 
-      var templateUrl = "main/files/modals/preview/others-modal.html",
+      let templateUrl = "main/files/modals/preview/others-modal.html",
         controller = "othersModalCtrl",
         backdrop = true;
 
@@ -1110,6 +1109,16 @@ angular.module("web").controller("filesCtrl", [
       });
     }
 
+    function doubleClickFile(row) {
+      if (row.isFolder) {
+        gotoAddress($scope.currentBucketName, row.path);
+      } else if (row.StorageClass && row.StorageClass.toLowerCase() === 'glacier') {
+        Dialog.alert(T('cannot.preview'), T('archived.notsupport'), null, 1);
+      } else {
+        showPreview(row);
+      }
+    }
+
     ////////////////////////////////
     var uploadDialog, downloadDialog;
 
@@ -1362,14 +1371,8 @@ angular.module("web").controller("filesCtrl", [
                 $timeout(() => {
                   $scope.total_folders = 0;
                 });
-
-                gotoAddress($scope.currentBucketName, row.path);
-              } else if (row.StorageClass && row.StorageClass.toLowerCase() === 'glacier') {
-                Dialog.alert(T('cannot.preview'), '归档存储文件不支持预览', null, 1);
-              } else {
-                showPreview(row);
               }
-
+              doubleClickFile(row);
               return false;
             }
           }
